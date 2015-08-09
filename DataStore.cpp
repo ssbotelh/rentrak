@@ -206,7 +206,7 @@ void DataStore::FetchRecords(std::vector<Field::Name> const &vFieldNames, std::v
 
         Record newRec;
         if (vFieldNames.empty()) {
-            newRec = std::move(rec);
+            newRec = rec;
         } else {
             for (Field::Name const &name : vFieldNames)
                 newRec.AddField(name, rec.GetFieldValue(name));

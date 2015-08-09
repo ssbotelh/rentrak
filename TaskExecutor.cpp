@@ -2,6 +2,8 @@
 #include "CmdLineArgs.h"
 #include "Operation.h"
 #include "SelectOperation.h"
+#include "SortOperation.h"
+#include <algorithm>
 #include <stdexcept>
 #include <iostream>
 #include <cassert>
@@ -26,15 +28,22 @@ Operation *TaskExecutor::CreateNewOperation(std::string const &prefix, std::stri
 {
     Operation *pOper(nullptr);
 
-    if (prefix == "s") {
-        pOper = new SelectOperation(cmd, m_dataStore);
-        assert(pOper != nullptr);
-    }
+    if (prefix == "s")
+        pOper = new SelectOperation(cmd, 0, m_dataStore);
+    else if (prefix == "o")
+        pOper = new SortOperation(cmd, 1, m_dataStore);
 
     if (pOper == nullptr)
         throw std::runtime_error("Unknown cmd line prefix: " + prefix);
 
     return pOper;
+}
+
+void TaskExecutor::PrepareOperations()
+{
+    //Sort operations in the order they must be executed
+    std::sort(m_vpOperations.begin(), m_vpOperations.end(),
+              [](Operation const *p1, Operation const *p2) { return p1->GetPriority() < p2->GetPriority(); });
 }
 
 void TaskExecutor::Run()
@@ -45,12 +54,13 @@ void TaskExecutor::Run()
         return;
     }
 
+    //Collect operations from cmd line
     for (CmdLineArgs::const_iterator it = m_cmdArgs.begin(); it != m_cmdArgs.end(); ++it)
         m_vpOperations.emplace_back(CreateNewOperation(it->first, it->second));
 
-    //Prepare operations...
-    //...
+    PrepareOperations();
 
+    //Execute operations
     for (Operation *pOper : m_vpOperations)
         pOper->Run(m_vRecords);
 

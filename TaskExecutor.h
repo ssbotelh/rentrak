@@ -19,6 +19,7 @@ private: //fields
  
 private: //methods
     Operation *CreateNewOperation(std::string const &prefix, std::string const &cmd);
+    void       PrepareOperations();
 
 public:
     TaskExecutor(CmdLineArgs const &args);

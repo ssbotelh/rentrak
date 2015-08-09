@@ -1,5 +1,9 @@
 TARGET = exe
 
+GCC = /usr/gcc-4.8.4/bin/g++
+
+#########################################################
+
 OBJS = \
 main.o \
 CmdLineArgs.o \
@@ -7,26 +11,19 @@ Field.o \
 Record.o \
 TaskExecutor.o \
 SelectOperation.o \
+SortOperation.o \
 DataStore.o \
 Utility.o \
 
 #########################################################
-#XMLRPCDIR=$(HOME)/XmlRpc/xmlrpc++0.7_p27/
 
-INCLUDE_DIRS=-I. # -I$(XMLRPCDIR)/include/
-#LIB_DIRS=-L$(BASE)/lib -L$(XMLRPCDIR)/gcc-64-release/
+INCLUDE_DIRS=-I.
 
-#GCC = g++
-GCC = /usr/gcc-4.8.4/bin/g++
-
-#CXXFLAGS = -I$(INCLUDE_DIRS) -Wall -g -gdwarf-2 -gstrict-dwarf 
-#CXXFLAGS = -I$(INCLUDE_DIRS) -Wall -g  -gdwarf-2 -O2 -std=c++0x
 CXXFLAGS = $(INCLUDE_DIRS) -Wall -g -gdwarf-2 -std=c++11 -O0
 libdir =  $(LIB_DIRS)
-libs = -lm -pthread
-#libs = -lcubpack -lm -lgsl -lgslcblas
+#libs = -lm -pthread
 
-# Default build rule (can be omitted)
+# Default build rule
 .c.o:  $(GCC) $(CXXFLAGS) -c $*.c
 
 %.o: %.cpp
