@@ -3,6 +3,8 @@
 
 #include "Field.h"
 #include <map>
+#include <vector>
+#include <string>
 
 class Record {
 private:
@@ -10,7 +12,10 @@ private:
 
 public:
     Record();
+    Record(std::vector<std::string> const &vValues);
     ~Record();
+
+    bool operator==(Record const &that) const;
 
     void         AddField(Field::Name const &name, Field::Value const &value);
     bool         HasField(Field::Name const &name) const;

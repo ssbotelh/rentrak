@@ -9,6 +9,7 @@ TaskExecutor::TaskExecutor(CmdLineArgs const &args)
     : m_cmdArgs(args)
     , m_vRecords()
     , m_vpOperations()
+    , m_fileMgr("_dataStore.db")
 {}
 
 TaskExecutor::~TaskExecutor()
@@ -34,6 +35,12 @@ Operation *TaskExecutor::CreateNewOperation(std::string const &prefix, std::stri
 
 void TaskExecutor::Run()
 {
+    // If "-i" found, only parse/import data and exit
+    if (m_cmdArgs.Exists("i")) {
+        m_fileMgr.ImportDataFromFile(m_cmdArgs.GetValue("i"));
+        return;
+    }
+
     for (CmdLineArgs::const_iterator it = m_cmdArgs.begin(); it != m_cmdArgs.end(); ++it)
         m_vpOperations.emplace_back(CreateNewOperation(it->first, it->second));
 }

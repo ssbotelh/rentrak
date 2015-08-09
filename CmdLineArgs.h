@@ -22,10 +22,11 @@ public:
     CmdLineArgs           (CmdLineArgs const &) = delete;
     CmdLineArgs &operator=(CmdLineArgs const &) = delete;
 
-    void Print() const;
+    bool        Exists(std::string const &param) const;
+    std::string GetValue(std::string const &name) const; 
+    void        Print() const;
 
-    //Iterators
-//    using iterator       = std::map<std::string, std::string>::iterator;
+    //Read-only iterator
     using const_iterator = std::map<std::string, std::string>::const_iterator;
 
     const_iterator begin() const { return m_mapNameValue.cbegin(); }

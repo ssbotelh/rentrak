@@ -52,6 +52,22 @@ std::string CmdLineArgs::RemovePrefix(std::string const &name) const
     return result;
 }
 
+bool CmdLineArgs::Exists(std::string const &param) const
+{
+    return (m_mapNameValue.find(param) != m_mapNameValue.cend());
+}
+
+std::string CmdLineArgs::GetValue(std::string const &param) const
+{
+    std::string value;
+
+    auto const it(m_mapNameValue.find(param));
+    if (it != m_mapNameValue.cend())
+        value = it->second;
+
+    return value;
+}
+
 void CmdLineArgs::Print() const
 {
     for (auto const &p : m_mapNameValue)

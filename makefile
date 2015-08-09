@@ -8,6 +8,8 @@ Record.o \
 TaskExecutor.o \
 Operation.o \
 SelectOperation.o \
+FileManager.o \
+DataStore.o \
 
 #########################################################
 #XMLRPCDIR=$(HOME)/XmlRpc/xmlrpc++0.7_p27/
