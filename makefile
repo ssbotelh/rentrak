@@ -6,9 +6,7 @@ CmdLineArgs.o \
 Field.o \
 Record.o \
 TaskExecutor.o \
-Operation.o \
 SelectOperation.o \
-FileManager.o \
 DataStore.o \
 Utility.o \
 
