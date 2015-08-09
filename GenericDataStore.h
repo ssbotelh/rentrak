@@ -15,9 +15,9 @@
 template <typename T>
 class GenericDataStore {
 private:
-    char  FileName[100];
-    FILE *fp;
-    bool  IsOpen;
+    char          FileName[100];
+    FILE mutable *fp;
+    bool mutable  IsOpen;
 
     public:
         //~~~~~ function default constructor ~~~~~~~~~~~~~~~~~~
@@ -59,7 +59,7 @@ private:
         // arguments: null
         // null
         // returns true if file open succeeds
-        bool Open() {
+        bool Open() const {
             if(IsOpen == false) {
                 fp = fopen(FileName,"rb+");
                 if(fp == NULL) {
@@ -188,7 +188,7 @@ private:
         // arguments: 0
         // 0
         // returns void
-        void Close() {
+        void Close() const {
             if(IsOpen == true) {
                 fclose(fp);
                 IsOpen = false;

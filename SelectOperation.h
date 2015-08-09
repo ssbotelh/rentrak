@@ -6,7 +6,7 @@
 
 class SelectOperation : public Operation {
 public:
-    SelectOperation(std::string const &cmd, FileManager &fileMgr);
+    SelectOperation(std::string const &cmd, DataStore &dataStore);
     ~SelectOperation();
 
     void Run(std::vector<Record> &vRecords) const override;

@@ -2,8 +2,8 @@
 #include "Field.h"
 #include "Utility.h"
 
-SelectOperation::SelectOperation(std::string const &cmd, FileManager &fileMgr)
-    : Operation(cmd, fileMgr)
+SelectOperation::SelectOperation(std::string const &cmd, DataStore &dataStore)
+    : Operation(cmd, dataStore)
 {}
 
 SelectOperation::~SelectOperation()
@@ -18,6 +18,6 @@ void SelectOperation::Run(std::vector<Record> &vRecords) const
     for (std::string const &token : tokens)
         vFieldNames.emplace_back(Field::ToEnum(token));
 
-    m_fileMgr.FetchRecords(vFieldNames, vRecords); 
+    m_dataStore.FetchRecords(vFieldNames, vRecords);
 }
 

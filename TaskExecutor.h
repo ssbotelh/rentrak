@@ -2,7 +2,7 @@
 #define RENTRAK_TASK_EXECUTOR
 
 #include "Record.h"
-#include "FileManager.h"
+#include "DataStore.h"
 #include <vector>
 
 class CmdLineArgs;
@@ -15,8 +15,8 @@ private: //fields
     CmdLineArgs const          &m_cmdArgs;
     std::vector<Record>         m_vRecords;
     std::vector<Operation *>    m_vpOperations;
-    FileManager                 m_fileMgr;
-    
+    DataStore                   m_dataStore;
+ 
 private: //methods
     Operation *CreateNewOperation(std::string const &prefix, std::string const &cmd);
 
