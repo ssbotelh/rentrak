@@ -18,7 +18,7 @@ private: //fields
     FileManager                 m_fileMgr;
     
 private: //methods
-    Operation *CreateNewOperation(std::string const &prefix, std::string const &cmd) const;
+    Operation *CreateNewOperation(std::string const &prefix, std::string const &cmd);
 
 public:
     TaskExecutor(CmdLineArgs const &args);

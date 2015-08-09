@@ -1,6 +1,8 @@
 #include "FileManager.h"
+#include "Utility.h"
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 
 FileManager::FileManager(std::string const &dbFileName)
     : m_dataStore(dbFileName)
@@ -8,37 +10,6 @@ FileManager::FileManager(std::string const &dbFileName)
 
 FileManager::~FileManager()
 {}
-
-// Base on: http://stackoverflow.com/questions/53849/how-do-i-tokenize-a-string-in-c
-void FileManager::Tokenize(std::string const        &input, 
-                           std::vector<std::string> &tokens, 
-                           std::string const        &delim,
-                           bool                      bAllowEmptyTokens)
-{
-    const static std::string sQUOTE_CHARACTERS = "\'\"";
-
-    size_t start = 0;
-    size_t end   = 0;
-    const size_t length = input.size();
-
-    while (end != std::string::npos && start < length) {
-        end = input.find_first_of(delim, start);
-
-        // If at end use length=remainder, else length=end-start.
-        const size_t token_length = end == std::string::npos ? length - start : end - start;
-
-        if (token_length > 0 || bAllowEmptyTokens) {
-            const std::string sToken(input.data() + start, token_length);
-            tokens.emplace_back(std::move(sToken));
-        }
-
-        start = end == std::string::npos ? std::string::npos : end + 1;
-    }            
-
-    // Handle case where delimiter is the last character, eg "a,b," -> { "a", "b", "" }
-    if (end != std::string::npos && start == length && bAllowEmptyTokens)
-        tokens.emplace_back("");
-}
 
 void FileManager::ImportDataFromFile(std::string const &file)
 {
@@ -51,7 +22,7 @@ void FileManager::ImportDataFromFile(std::string const &file)
     //Add all Records from input file to temporary storage
     while (std::getline(infile, line)) {
         std::vector<std::string> tokens;
-        Tokenize(line, tokens, "|");
+        Utility::Tokenize(line, tokens, "|");
 
         if (tokens.size() != 6)
             throw std::runtime_error("Bad record in file (found " + std::to_string(tokens.size()) + " fields, expected 6)");
@@ -116,5 +87,23 @@ void FileManager::ImportDataFromFile(std::string const &file)
         r.Print();
     }
 */
+}
+
+void FileManager::FetchRecords(std::vector<Field::Name> const &vFieldNames, std::vector<Record> &vRecords)
+{
+    m_dataStore.Open();
+
+    size_t const size(m_dataStore.GetNumRecords());
+    for (size_t ii = 0; ii < size; ++ii) {
+        Record const rec(m_dataStore.FetchRecord(ii));
+
+        Record newRec;
+        for (Field::Name const &name : vFieldNames)
+            newRec.AddField(name, rec.GetFieldValue(name));
+
+        vRecords.emplace_back(newRec);
+    }
+
+    m_dataStore.Close();
 }
 

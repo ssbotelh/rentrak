@@ -74,12 +74,12 @@ void DataStore::Close()
     m_GenDataStore.Close();
 }
 
-unsigned long DataStore::GetNumRecords()
+unsigned long DataStore::GetNumRecords() const
 {
     return m_GenDataStore.GetRecordCount();
 }
 
-Record DataStore::FetchRecord(unsigned long index)
+Record DataStore::FetchRecord(unsigned long index) const
 {
     FixedSizeRecord const fsr(m_GenDataStore.FindRecord(index));
     Record          const rec(fsr.GetRecord());

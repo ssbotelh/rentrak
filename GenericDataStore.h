@@ -97,7 +97,7 @@ private:
         // arguments: unsigned long
         // arg is the index position of the record in file
         // returns record if found
-        T FindRecord(unsigned long index) {
+        T FindRecord(unsigned long index) const {
             rewind(fp);
             unsigned long pos = index * sizeof(T);
             fseek(fp,pos,SEEK_CUR);
@@ -175,7 +175,7 @@ private:
         // arguments: null
         // 0
         // returns record count
-        unsigned long GetRecordCount() {
+        unsigned long GetRecordCount() const {
             fseek(fp,0,SEEK_END);
             unsigned long len = ftell(fp);
             unsigned long recs = len / sizeof(T);

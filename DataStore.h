@@ -31,8 +31,8 @@ public:
 
     void          Open();
     void          Close();
-    unsigned long GetNumRecords(); //const?
-    Record        FetchRecord(unsigned long index); //const?
+    unsigned long GetNumRecords() const;
+    Record        FetchRecord(unsigned long index) const;
     void          UpdateRecord(Record const &rec, unsigned long index);
     void          AddRecord(Record const &rec);
 };

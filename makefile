@@ -10,6 +10,7 @@ Operation.o \
 SelectOperation.o \
 FileManager.o \
 DataStore.o \
+Utility.o \
 
 #########################################################
 #XMLRPCDIR=$(HOME)/XmlRpc/xmlrpc++0.7_p27/

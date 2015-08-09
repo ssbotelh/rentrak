@@ -21,12 +21,12 @@ TaskExecutor::~TaskExecutor()
     m_vRecords.clear();
 }
 
-Operation *TaskExecutor::CreateNewOperation(std::string const &prefix, std::string const &cmd) const
+Operation *TaskExecutor::CreateNewOperation(std::string const &prefix, std::string const &cmd)
 {
     Operation *pOper(nullptr);
 
     if (prefix == "s") {
-        pOper = new SelectOperation(cmd);
+        pOper = new SelectOperation(cmd, m_fileMgr);
         assert(pOper != nullptr);
     }
 
@@ -43,5 +43,15 @@ void TaskExecutor::Run()
 
     for (CmdLineArgs::const_iterator it = m_cmdArgs.begin(); it != m_cmdArgs.end(); ++it)
         m_vpOperations.emplace_back(CreateNewOperation(it->first, it->second));
+
+    //Prepare operations...
+    //...
+
+    for (Operation *pOper : m_vpOperations)
+        pOper->Run(m_vRecords);
+
+    //Print results
+    for (Record const &rec : m_vRecords)
+        rec.Print();
 }
 

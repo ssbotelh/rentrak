@@ -10,14 +10,12 @@ class FileManager {
 private: //fields
     DataStore m_dataStore;
 
-private: //methods
-    void Tokenize(std::string const &input, std::vector<std::string> &tokens, std::string const &delim, bool bAllowEmptyTokens = false);
-
 public:
     FileManager(std::string const &dbFileName);
     ~FileManager();
 
     void ImportDataFromFile(std::string const &file);
+    void FetchRecords(std::vector<Field::Name> const &vFieldNames, std::vector<Record> &vRecords);
 };
 
 #endif //RENTRAK_FILE_MANAGER

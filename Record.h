@@ -2,13 +2,12 @@
 #define RENTRAK_RECORD
 
 #include "Field.h"
-#include <map>
 #include <vector>
 #include <string>
 
 class Record {
 private:
-    std::map<Field::Name, Field::Value> m_Fields;
+    std::vector<std::pair<Field::Name, Field::Value>> m_Fields;
 
 public:
     Record();

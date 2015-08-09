@@ -1,4 +1,5 @@
 #include "Record.h"
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <string.h>
@@ -33,21 +34,31 @@ bool Record::operator==(Record const &that) const
 
 void Record::AddField(Field::Name const &name, Field::Value const &value)
 {
-    m_Fields[name] = value;
+    auto const findIt(std::find_if(m_Fields.begin(), m_Fields.end(),
+                      [&name](std::pair<Field::Name, Field::Value> const &p) { return p.first == name; }));
+
+    if (findIt != m_Fields.cend())
+        findIt->second = value;
+    else
+        m_Fields.emplace_back(name, value);
 }
 
 bool Record::HasField(Field::Name const &name) const
 {
-    return (m_Fields.find(name) != m_Fields.cend());
+    auto const findIt(std::find_if(m_Fields.begin(), m_Fields.end(),
+                      [&name](std::pair<Field::Name, Field::Value> const &p) { return p.first == name; }));
+    return (findIt != m_Fields.cend());
 }
 
 Field::Value Record::GetFieldValue(Field::Name const &name) const
 {
     Field::Value value;
 
-    auto const iter(m_Fields.find(name));
-    if (iter != m_Fields.cend())
-        value = iter->second;
+    auto const findIt(std::find_if(m_Fields.begin(), m_Fields.end(),
+                      [&name](std::pair<Field::Name, Field::Value> const &p) { return p.first == name; }));
+
+    if (findIt != m_Fields.cend())
+        value = findIt->second;
 
     return value;
 }
@@ -57,9 +68,12 @@ void Record::Print() const
     size_t counter(0);
 
     for (auto const &p : m_Fields) {
+        if (p.second.empty())
+            continue;
+
         std::cout << p.second;
         if (counter < m_Fields.size() - 1)
-            std::cout << " || ";
+            std::cout << ",";
 
         ++counter;
     }
