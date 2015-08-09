@@ -1,4 +1,7 @@
 #include "DataStore.h"
+#include "Utility.h"
+#include <fstream>
+#include <iostream>
 #include <stdexcept>
 #include <cassert>
 
@@ -63,13 +66,27 @@ DataStore::~DataStore()
     Close();
 }
 
-void DataStore::Open()
+FixedSizeRecord DataStore::ConvertToFixedSize(Record const &rec) const
+{
+    FixedSizeRecord fsr;
+
+    CopyString(fsr.stb,                 rec.GetFieldValue(Field::STB), 64);
+    CopyString(fsr.title,               rec.GetFieldValue(Field::TITLE), 64);
+    CopyString(fsr.provider,            rec.GetFieldValue(Field::PROVIDER), 64);
+    CopyString(fsr.date,                rec.GetFieldValue(Field::DATE), 11);
+    CopyValue (fsr.dollars, fsr.cents,  rec.GetFieldValue(Field::REV), '.');
+    CopyValue (fsr.hours, fsr.mins,     rec.GetFieldValue(Field::VIEW_TIME), ':');
+
+    return fsr;
+}
+
+void DataStore::Open() const
 {
     if (!m_GenDataStore.Open())
         throw std::runtime_error("Failed to open datastore.");
 }
 
-void DataStore::Close()
+void DataStore::Close() const
 {
     m_GenDataStore.Close();
 }
@@ -101,17 +118,103 @@ void DataStore::AddRecord(Record const &rec)
         throw std::runtime_error("Failed to add record in datastore");
 }
 
-FixedSizeRecord DataStore::ConvertToFixedSize(Record const &rec) const
+void DataStore::ImportDataFromFile(std::string const &file)
 {
-    FixedSizeRecord fsr;
+    std::ifstream infile(file);
+    std::string line;
+    std::getline(infile, line); //skip first line (assume it's always a header)
 
-    CopyString(fsr.stb,                 rec.GetFieldValue(Field::STB), 64);
-    CopyString(fsr.title,               rec.GetFieldValue(Field::TITLE), 64);
-    CopyString(fsr.provider,            rec.GetFieldValue(Field::PROVIDER), 64);
-    CopyString(fsr.date,                rec.GetFieldValue(Field::DATE), 11);
-    CopyValue (fsr.dollars, fsr.cents,  rec.GetFieldValue(Field::REV), '.');
-    CopyValue (fsr.hours, fsr.mins,     rec.GetFieldValue(Field::VIEW_TIME), ':');
+    std::vector<std::pair<Record, bool>> vRecordsToAdd; //boolean keeps track if Record already exists in datastore
 
-    return fsr;
+    //Add all Records from input file to temporary storage
+    while (std::getline(infile, line)) {
+        std::vector<std::string> tokens;
+        Utility::Tokenize(line, tokens, "|");
+
+        if (tokens.size() != 6)
+            throw std::runtime_error("Bad record in file (found " + std::to_string(tokens.size()) + " fields, expected 6)");
+
+        Record const rec(tokens);
+        vRecordsToAdd.emplace_back(std::make_pair(rec, false));
+    }
+
+    std::cout << vRecordsToAdd.size() << " record(s) read from file" << std::endl;
+
+    //Read data store (from file) and update existing records
+    size_t numUpdated(0);
+    Open();
+    size_t const size(GetNumRecords());
+    for (size_t ii = 0; ii < size; ++ii) {
+        Record const oldRec(FetchRecord(ii));
+
+        for (auto &pp : vRecordsToAdd) {
+            Record &rec  (pp.first);
+            bool   &added(pp.second);
+
+            if (added)
+                continue;
+
+            if (rec == oldRec) {
+                UpdateRecord(rec, ii);
+                added = true;
+                ++numUpdated;
+            }
+        }
+    }
+
+    if (numUpdated > 0)
+        std::cout << numUpdated << " record(s) updated in datastore" << std::endl;
+
+    //Finally, add brand new records to datastore
+    size_t numAdded(0);
+    for (auto const &pp : vRecordsToAdd) {
+        Record const &rec(pp.first);
+        bool   const &added(pp.second);
+
+        if (added)
+            continue;
+
+        AddRecord(rec);
+        ++numAdded;
+    }
+
+    if (numAdded > 0)
+        std::cout << numAdded << " record(s) added to datastore" << std::endl;
+
+    Close();
+
+/*
+    std::cout << std::endl;
+    Open();
+    size_t const num(GetRecordCount());
+    std::cout << "Num = " << num << std::endl;
+    for (size_t ii = 0; ii < num; ++ii) {
+        BareRecord const br(FindRecord(ii));
+        Record const r(br.ConvertFromBare());
+        r.Print();
+    }
+*/
+}
+
+void DataStore::FetchRecords(std::vector<Field::Name> const &vFieldNames, std::vector<Record> &vRecords) const
+{
+    Open();
+
+    size_t const size(GetNumRecords());
+    for (size_t ii = 0; ii < size; ++ii) {
+        Record const rec(FetchRecord(ii));
+
+        Record newRec;
+        if (vFieldNames.empty()) {
+            newRec = std::move(rec);
+        } else {
+            for (Field::Name const &name : vFieldNames)
+                newRec.AddField(name, rec.GetFieldValue(name));
+        }
+
+        vRecords.emplace_back(newRec);
+    }
+
+    Close();
 }
 
