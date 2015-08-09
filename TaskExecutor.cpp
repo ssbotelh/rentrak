@@ -2,6 +2,7 @@
 #include "CmdLineArgs.h"
 #include "Operation.h"
 #include "SelectOperation.h"
+#include <stdexcept>
 #include <iostream>
 #include <cassert>
 
@@ -9,7 +10,7 @@ TaskExecutor::TaskExecutor(CmdLineArgs const &args)
     : m_cmdArgs(args)
     , m_vRecords()
     , m_vpOperations()
-    , m_fileMgr("_dataStore.db")
+    , m_dataStore("_dataStore.db")
 {}
 
 TaskExecutor::~TaskExecutor()
@@ -26,9 +27,12 @@ Operation *TaskExecutor::CreateNewOperation(std::string const &prefix, std::stri
     Operation *pOper(nullptr);
 
     if (prefix == "s") {
-        pOper = new SelectOperation(cmd, m_fileMgr);
+        pOper = new SelectOperation(cmd, m_dataStore);
         assert(pOper != nullptr);
     }
+
+    if (pOper == nullptr)
+        throw std::runtime_error("Unknown cmd line prefix: " + prefix);
 
     return pOper;
 }
@@ -37,7 +41,7 @@ void TaskExecutor::Run()
 {
     // If "-i" found, only parse/import data and exit
     if (m_cmdArgs.Exists("i")) {
-        m_fileMgr.ImportDataFromFile(m_cmdArgs.GetValue("i"));
+        m_dataStore.ImportDataFromFile(m_cmdArgs.GetValue("i"));
         return;
     }
 
