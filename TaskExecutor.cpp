@@ -3,6 +3,7 @@
 #include "Operation.h"
 #include "SelectOperation.h"
 #include "SortOperation.h"
+#include "FilterOperation.h"
 #include <algorithm>
 #include <stdexcept>
 #include <iostream>
@@ -30,8 +31,10 @@ Operation *TaskExecutor::CreateNewOperation(std::string const &prefix, std::stri
 
     if (prefix == "s")
         pOper = new SelectOperation(cmd, 0, m_dataStore);
+    else if (prefix == "f")
+        pOper = new FilterOperation(cmd, 1, m_dataStore);
     else if (prefix == "o")
-        pOper = new SortOperation(cmd, 1, m_dataStore);
+        pOper = new SortOperation(cmd, 2, m_dataStore);
 
     if (pOper == nullptr)
         throw std::runtime_error("Unknown cmd line prefix: " + prefix);

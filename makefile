@@ -12,6 +12,7 @@ Record.o \
 TaskExecutor.o \
 SelectOperation.o \
 SortOperation.o \
+FilterOperation.o \
 DataStore.o \
 Utility.o \
 
