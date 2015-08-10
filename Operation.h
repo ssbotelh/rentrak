@@ -8,13 +8,13 @@
 
 class Operation {
 protected:
-    std::string  m_sCommands;
-    size_t       m_uPriority;
-    DataStore   &m_dataStore;
+    std::vector<std::string>    m_vsCommands;
+    size_t                      m_uPriority;
+    DataStore const            &m_dataStore;
 
 public:
-    Operation(std::string const &cmd, size_t const priority, DataStore &dataStore)
-        : m_sCommands(cmd)
+    Operation(std::vector<std::string> const &vCmds, size_t const priority, DataStore const &dataStore)
+        : m_vsCommands(vCmds)
         , m_uPriority(priority)
         , m_dataStore(dataStore)
     {}
@@ -22,7 +22,7 @@ public:
     virtual ~Operation()
     {}
 
-    virtual void Run(std::vector<Record> &vRecords) const = 0;
+    virtual void Run(std::vector<Record> &vRecords) = 0;
     size_t       GetPriority() const { return m_uPriority; }
 };
 

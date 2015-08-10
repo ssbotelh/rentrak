@@ -6,10 +6,13 @@
 
 class SortOperation : public Operation {
 public:
-    SortOperation(std::string const &cmd, size_t const priority, DataStore &dataStore);
+    SortOperation(std::vector<std::string> const &vCmds,
+                  size_t                   const  priority,
+                  DataStore                const &dataStore);
+
     ~SortOperation();
 
-    void Run(std::vector<Record> &vRecords) const;
+    void Run(std::vector<Record> &vRecords);
 };
 
 #endif //RENTRAK_SORT_OPERATION

@@ -10,7 +10,6 @@ int main(int argc, char *argv[])
 
     try {
         CmdLineArgs cmdParams(argc, argv);
-//        cmdParams.Print();
 
         TaskExecutor exec(cmdParams);
         exec.Run();

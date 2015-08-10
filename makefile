@@ -1,4 +1,4 @@
-TARGET = exe
+TARGET = query
 
 GCC = /usr/gcc-4.8.4/bin/g++
 
@@ -6,15 +6,16 @@ GCC = /usr/gcc-4.8.4/bin/g++
 
 OBJS = \
 main.o \
+Utility.o \
 CmdLineArgs.o \
+DataStore.o \
 Field.o \
 Record.o \
 TaskExecutor.o \
 SelectOperation.o \
 SortOperation.o \
 FilterOperation.o \
-DataStore.o \
-Utility.o \
+GroupOperation.o \
 
 #########################################################
 

@@ -18,7 +18,7 @@ private: //fields
     DataStore                   m_dataStore;
  
 private: //methods
-    Operation *CreateNewOperation(std::string const &prefix, std::string const &cmd);
+    Operation *CreateNewOperation(std::string const &prefix, std::string const &cmd) const;
     void       PrepareOperations();
 
 public:

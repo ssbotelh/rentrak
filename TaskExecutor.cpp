@@ -4,6 +4,7 @@
 #include "SelectOperation.h"
 #include "SortOperation.h"
 #include "FilterOperation.h"
+#include "GroupOperation.h"
 #include <algorithm>
 #include <stdexcept>
 #include <iostream>
@@ -25,16 +26,18 @@ TaskExecutor::~TaskExecutor()
     m_vRecords.clear();
 }
 
-Operation *TaskExecutor::CreateNewOperation(std::string const &prefix, std::string const &cmd)
+Operation *TaskExecutor::CreateNewOperation(std::string const &prefix, std::string const &cmd) const
 {
     Operation *pOper(nullptr);
 
     if (prefix == "s")
-        pOper = new SelectOperation(cmd, 0, m_dataStore);
+        pOper = new SelectOperation({cmd}, 0, m_dataStore);
     else if (prefix == "f")
-        pOper = new FilterOperation(cmd, 1, m_dataStore);
+        pOper = new FilterOperation({cmd}, 1, m_dataStore);
     else if (prefix == "o")
-        pOper = new SortOperation(cmd, 2, m_dataStore);
+        pOper = new SortOperation({cmd}, 2, m_dataStore);
+    else if (prefix == "g")
+        pOper = new GroupOperation({cmd, m_cmdArgs.GetValue("s")}, 3, m_dataStore);
 
     if (pOper == nullptr)
         throw std::runtime_error("Unknown cmd line prefix: " + prefix);

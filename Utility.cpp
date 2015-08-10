@@ -1,16 +1,18 @@
 #include "Utility.h"
+#include <algorithm>
 
 // Base on: http://stackoverflow.com/questions/53849/how-do-i-tokenize-a-string-in-c
-void Utility::Tokenize(std::string const        &input, 
-                       std::vector<std::string> &tokens, 
-                       std::string const        &delim,
-                       bool                      bAllowEmptyTokens)
+std::vector<std::string> Utility::Tokenize(std::string const        &input, 
+                                           std::string const        &delim,
+                                           bool        const         bAllowEmptyTokens)
 {
     const static std::string sQUOTE_CHARACTERS = "\'\"";
 
     size_t start = 0;
     size_t end   = 0;
     const size_t length = input.size();
+
+    std::vector<std::string> tokens;
 
     while (end != std::string::npos && start < length) {
         end = input.find_first_of(delim, start);
@@ -29,5 +31,24 @@ void Utility::Tokenize(std::string const        &input,
     // Handle case where delimiter is the last character, eg "a,b," -> { "a", "b", "" }
     if (end != std::string::npos && start == length && bAllowEmptyTokens)
         tokens.emplace_back("");
+
+    return tokens;
+}
+
+std::string Utility::FormatString(unsigned const left, unsigned const right, char const sep)
+{
+    std::string ret(std::to_string(left));
+    ret += sep;
+    ret += (right < 10 ? "0" : "");
+    ret += std::to_string(right);
+
+    return ret;
+}
+
+std::string Utility::ToUpper(std::string const &s)
+{
+    std::string str(s);
+    std::transform(str.begin(), str.end(),str.begin(), ::toupper);
+    return str;
 }
 

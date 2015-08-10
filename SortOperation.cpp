@@ -2,19 +2,26 @@
 #include "Field.h"
 #include "Utility.h"
 #include <algorithm>
+#include <cassert>
 
-SortOperation::SortOperation(std::string const &cmd, size_t const priority, DataStore &dataStore)
-    : Operation(cmd, priority, dataStore)
+SortOperation::SortOperation(std::vector<std::string> const &vCmds,
+                             size_t                   const  priority,
+                             DataStore                const &dataStore)
+    : Operation(vCmds, priority, dataStore)
 {}
 
 SortOperation::~SortOperation()
 {}
 
-void SortOperation::Run(std::vector<Record> &vRecords) const
+void SortOperation::Run(std::vector<Record> &vRecords)
 {
+    assert(m_vsCommands.size() == 1);
+    std::string const sSortParams(m_vsCommands.front());
+    if (sSortParams.empty())
+        throw std::runtime_error("Sort parameter (-o) expects an argument");
+
     //Collect all field names we want to sort by
-    std::vector<std::string> tokens;
-    Utility::Tokenize(m_sCommands, tokens, ",");
+    std::vector<std::string> const tokens(Utility::Tokenize(sSortParams, ","));
 
     std::vector<Field::Name> vFieldNames;
     for (std::string const &token : tokens)

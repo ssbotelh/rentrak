@@ -6,10 +6,13 @@
 
 class SelectOperation : public Operation {
 public:
-    SelectOperation(std::string const &cmd, size_t const priority, DataStore &dataStore);
+    SelectOperation(std::vector<std::string> const &vCmds,
+                    size_t                   const  priority,
+                    DataStore                const &dataStore);
+
     ~SelectOperation();
 
-    void Run(std::vector<Record> &vRecords) const;
+    void Run(std::vector<Record> &vRecords);
 };
 
 #endif //RENTRAK_SELECT_OPERATION

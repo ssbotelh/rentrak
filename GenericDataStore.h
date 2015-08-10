@@ -1,10 +1,3 @@
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// GenericDataStore.h
-// defines a template class to handle record files
-// Author: Vijay Mathew Pandyalakal
-// Date: 12/23/2001 11:08:12 AM
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 #ifndef RENTRAK_GENERIC_DATASTORE
 #define RENTRAK_GENERIC_DATASTORE
 
@@ -224,6 +217,3 @@ private:
 
 #endif //RENTRAK_GENERIC_DATASTORE
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// end of GenericDataStore.h
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

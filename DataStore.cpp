@@ -27,16 +27,6 @@ void CopyValue(unsigned &left, unsigned &right, std::string const &value, char c
     }
 }
 
-std::string FormatString(unsigned const left, unsigned const right, char const sep)
-{
-    std::string ret(std::to_string(left));
-    ret += sep;
-    ret += (right < 10 ? "0" : "");
-    ret += std::to_string(right);
-
-    return ret;
-}
-
 /////////////////////////////////////////////////
 
 Record FixedSizeRecord::GetRecord() const
@@ -47,8 +37,8 @@ Record FixedSizeRecord::GetRecord() const
     r.AddField(Field::TITLE,     std::string(title));
     r.AddField(Field::PROVIDER,  std::string(provider));
     r.AddField(Field::DATE,      std::string(date));
-    r.AddField(Field::REV,       FormatString(dollars, cents, '.'));
-    r.AddField(Field::VIEW_TIME, FormatString(hours, mins, ':'));
+    r.AddField(Field::REV,       Utility::FormatString(dollars, cents, '.'));
+    r.AddField(Field::VIEW_TIME, Utility::FormatString(hours, mins, ':'));
 
     return r;
 }
@@ -128,8 +118,7 @@ void DataStore::ImportDataFromFile(std::string const &file)
 
     //Add all Records from input file to temporary storage
     while (std::getline(infile, line)) {
-        std::vector<std::string> tokens;
-        Utility::Tokenize(line, tokens, "|");
+        std::vector<std::string> const tokens(Utility::Tokenize(line, "|"));
 
         if (tokens.size() != 6)
             throw std::runtime_error("Bad record in file (found " + std::to_string(tokens.size()) + " fields, expected 6)");
