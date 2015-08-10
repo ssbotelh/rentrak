@@ -1,9 +1,9 @@
 # rentrak code challenge
 
 1. General remarks:
-o All functionality described in items 1, 2.1 and 2.2 was implemented. 
-o The advanced filtering capability of item 2.3 was not implemented.
-o Code must be built with C++11 support. I could only test with gcc 4.8.4 on a Linux PC box.
+* All functionality described in items 1, 2.1 and 2.2 was implemented. 
+* The advanced filtering capability of item 2.3 was not implemented.
+* Code must be built with C++11 support. I could only test with gcc 4.8.4 on a Linux PC box.
 
 2. Build instructions:
 - Checkout code from git
