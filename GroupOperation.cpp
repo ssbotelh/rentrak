@@ -18,6 +18,20 @@ std::string ConvertToStringWithPrecision(double const value)
     return stream.str();
 }
 
+bool IsLessThan(std::string const &l, std::string const &r)
+{
+    //First assume they're numbers
+    try {
+        double const dl(std::stod(l));
+        double const dr(std::stod(r));
+        return (dl < dr);
+    } catch(...) {
+        return (l < r); //compare as strings
+    }
+
+    return false; //never happens
+}
+
 ///////////////////////////////////////////////////////////////////////////
 
 GroupOperation::GroupOperation(std::vector<std::string> const &vCmds,
@@ -60,7 +74,7 @@ std::string GroupOperation::PerformAggregation(std::vector<Record> const &vRecor
             case Aggregate::MIN: {
                 try {
                     result = (result.empty() ? value
-                                             : (result < value ? result : value));
+                                             : (IsLessThan(result, value) ? result : value));
                 } catch(...) {
                     throw std::runtime_error("Failed to apply aggregate MIN to field " + Field::ToString(field));
                 }
@@ -69,7 +83,7 @@ std::string GroupOperation::PerformAggregation(std::vector<Record> const &vRecor
             case Aggregate::MAX: {
                 try {
                     result = (result.empty() ? value
-                                             : (result > value ? result : value));
+                                             : (!IsLessThan(result, value) ? result : value));
                 } catch(...) {
                     throw std::runtime_error("Failed to apply aggregate MAX to field " + Field::ToString(field));
                 }
