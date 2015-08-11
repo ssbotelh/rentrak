@@ -7,10 +7,10 @@
 
 template <typename T>
 class GenericDataStore {
-private:
-    char          FileName[100];
-    FILE mutable *fp;
-    bool mutable  IsOpen;
+    private:
+        char          FileName[100];
+        FILE mutable *fp;
+        bool mutable  bIsOpen;
 
     public:
         //~~~~~ function default constructor ~~~~~~~~~~~~~~~~~~
@@ -19,7 +19,7 @@ private:
         // null
         // returns null
         GenericDataStore() {
-            IsOpen = false;
+            bIsOpen = false;
             strcpy(FileName,"");
         }
         //~~~~~~ end of function default constructor~~~~~~~~~~~~~~~~~
@@ -31,7 +31,7 @@ private:
         // copied to file name
         // returns null
         GenericDataStore(const char* fnm) {
-            IsOpen = false;
+            bIsOpen = false;
             strcpy(FileName,fnm);
         }
         //~~~~~~ end of function oveloaded constructor~~~~~~~~~~~~~~~~~
@@ -47,22 +47,29 @@ private:
         }
         //~~~~~~ end of function SetFileName~~~~~~~~~~~~~~~~~
 
+        //~~~~~ function IsOpen ~~~~~~~~~~~~~~~~~~
+        // Returns true if file is open.
+        // returns bool
+        bool IsOpen() const {
+            return bIsOpen;
+        }
+
         //~~~~~ function Open ~~~~~~~~~~~~~~~~~~
         // opens a file in read/write binary mode
         // arguments: null
         // null
         // returns true if file open succeeds
         bool Open() const {
-            if(IsOpen == false) {
+            if(bIsOpen == false) {
                 fp = fopen(FileName,"rb+");
                 if(fp == NULL) {
                     fp = fopen(FileName,"wb+");
                 }
                 if(fp == NULL) {
-                    IsOpen = false;
+                    bIsOpen = false;
                     return false;
                 }
-                IsOpen = true;
+                bIsOpen = true;
                 return true;
             } else {
                     return true;
@@ -182,9 +189,9 @@ private:
         // 0
         // returns void
         void Close() const {
-            if(IsOpen == true) {
+            if(bIsOpen == true) {
                 fclose(fp);
-                IsOpen = false;
+                bIsOpen = false;
             }
         }
         //~~~~~~ end of function Close~~~~~~~~~~~~~~~~~
@@ -209,7 +216,7 @@ private:
         //~~~~~~ end of function GetNextRecordNo~~~~~~~~~~~~~~~~~
         
         ~GenericDataStore() {
-            if(IsOpen == true) {
+            if(bIsOpen == true) {
                 Close();
             }
         }
