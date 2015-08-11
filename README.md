@@ -15,7 +15,6 @@
 1. Data can be loaded into the datastore with the -i option
 
 $ ./query -i data1.txt
-
 4 record(s) read from file
 4 record(s) added to datastore
 
