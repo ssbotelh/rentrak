@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <cassert>
 
-////////////////////////////////////////
+/////////////////////////////////////////////////
 // Helper functions
 //
 void CopyString(char *dest, std::string const &src, size_t const size)
@@ -28,7 +28,8 @@ void CopyValue(unsigned &left, unsigned &right, std::string const &value, char c
 }
 
 /////////////////////////////////////////////////
-
+// struct FixedSizeRecord
+//
 Record FixedSizeRecord::GetRecord() const
 {
     Record r;
@@ -43,8 +44,51 @@ Record FixedSizeRecord::GetRecord() const
     return r;
 }
 
-////////////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// class DataStore::iterator
+// class DataStore::const_iterator
+//
+DataStore::const_iterator::const_iterator(DataStore const &ds, size_t const index)
+    : m_data(ds)
+    , m_uIndex(index)
+    , m_uMaxIndex(ds.GetNumRecords())
+{}
 
+DataStore::const_iterator::~const_iterator()
+{}
+
+bool DataStore::const_iterator::operator==(DataStore::const_iterator const &that) const
+{
+    return ((&m_data == &that.m_data) && // same DataStore...
+            (m_uIndex == that.m_uIndex));  // ... and same index
+}
+
+bool DataStore::const_iterator::operator!=(DataStore::const_iterator const &that) const
+{
+    return !(*this == that);
+}
+
+Record DataStore::const_iterator::operator*() const
+{
+    if (!m_data.IsOpen())
+        throw std::runtime_error("Must open datastore before using iterators");
+
+    assert(m_uIndex < m_uMaxIndex);
+    return m_data.FetchRecord(m_uIndex); 
+}
+
+DataStore::const_iterator &DataStore::const_iterator::operator++()
+{
+    if (!m_data.IsOpen())
+        throw std::runtime_error("Must open datastore before using iterators");
+
+    ++m_uIndex;
+    return *this;
+}
+
+/////////////////////////////////////////////////
+// class DataStore
+//
 DataStore::DataStore(std::string const &file)
     : m_GenDataStore(file.c_str())
 {
@@ -79,6 +123,11 @@ void DataStore::Open() const
 void DataStore::Close() const
 {
     m_GenDataStore.Close();
+}
+
+bool DataStore::IsOpen() const
+{
+    return m_GenDataStore.IsOpen();
 }
 
 unsigned long DataStore::GetNumRecords() const
@@ -171,39 +220,21 @@ void DataStore::ImportDataFromFile(std::string const &file)
         std::cout << numAdded << " record(s) added to datastore" << std::endl;
 
     Close();
-
-/*
-    std::cout << std::endl;
-    Open();
-    size_t const num(GetRecordCount());
-    std::cout << "Num = " << num << std::endl;
-    for (size_t ii = 0; ii < num; ++ii) {
-        BareRecord const br(FindRecord(ii));
-        Record const r(br.ConvertFromBare());
-        r.Print();
-    }
-*/
 }
 
-void DataStore::FetchRecords(std::vector<Field::Name> const &vFieldNames, std::vector<Record> &vRecords) const
+DataStore::const_iterator DataStore::begin() const
 {
-    Open();
+    if (!IsOpen())
+        throw std::runtime_error("Must open datastore before calling begin()");
 
-    size_t const size(GetNumRecords());
-    for (size_t ii = 0; ii < size; ++ii) {
-        Record const rec(FetchRecord(ii));
+    return DataStore::const_iterator(*this, 0);
+}
 
-        Record newRec;
-        if (vFieldNames.empty()) {
-            newRec = rec;
-        } else {
-            for (Field::Name const &name : vFieldNames)
-                newRec.AddField(name, rec.GetFieldValue(name));
-        }
+DataStore::const_iterator DataStore::end() const
+{
+    if (!IsOpen())
+        throw std::runtime_error("Must open datastore before calling end()");
 
-        vRecords.emplace_back(newRec);
-    }
-
-    Close();
+    return DataStore::const_iterator(*this, GetNumRecords());
 }
 
