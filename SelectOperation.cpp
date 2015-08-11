@@ -22,7 +22,24 @@ void SelectOperation::Run(std::vector<Record> &vRecords)
     for (std::string const &token : tokens)
         vFieldNames.emplace_back(Field::ToEnum(Utility::Tokenize(token, ":").front()));
 
-    //Fetch all DB records, populating only the selected fields
-    m_dataStore.FetchRecords(vFieldNames, vRecords);
+    //Iterate over all DB records, populating our records only with the desired fields
+    vRecords.clear();
+    m_dataStore.Open();
+
+    for (DataStore::const_iterator it = m_dataStore.begin(); it != m_dataStore.end(); ++it) {
+        Record const rec(*it);
+
+        Record newRec;
+        if (vFieldNames.empty()) {
+            newRec = rec;
+        } else {
+            for (Field::Name const &name : vFieldNames)
+                newRec.AddField(name, rec.GetFieldValue(name));
+        }
+
+        vRecords.emplace_back(newRec);
+    }
+
+    m_dataStore.Close();
 }
 
