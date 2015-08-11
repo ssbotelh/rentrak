@@ -1,24 +1,24 @@
-# rentrak code challenge
+## rentrak code challenge
 
-1. General remarks:
-* All functionality described in items 1, 2.1 and 2.2 was implemented. 
-* The advanced filtering capability of item 2.3 was not implemented.
-* Code must be built with C++11 support. I could only test with gcc 4.8.4 on a Linux PC box.
+# General remarks:
+1. All functionality described in items 1, 2.1 and 2.2 was implemented. 
+2. The advanced filtering capability of item 2.3 was not implemented.
+3. Code must be built with C++11 support. I could only test with gcc 4.8.4 on a Linux PC box.
 
-2. Build instructions:
-- Checkout code from git
-- Edit the makefile and change the GCC parameter to your g++ path.
-- Run 'make'
-- An executable "query" should be created.
+# Build instructions:
+1. Checkout code from git
+2. Edit the makefile and change the GCC parameter to your g++ path.
+3. Run 'make'
+4. An executable "query" should be created.
 
-3. Usage:
-- Data can be loaded into the datastore with the -i option:
+# Usage:
+1. Data can be loaded into the datastore with the -i option:
 $ ./query -i data1.txt
 4 record(s) read from file
 4 record(s) added to datastore
 
-- A database file called "_dataStore.db" is produced. Subsequent stores update the same file.
-- The program also supports the -s, -o, -f and -g command-line parameters. Examples:
+2. A database file called "_dataStore.db" is produced. Subsequent stores update the same file.
+3. The program also supports the -s, -o, -f and -g command-line parameters. Examples:
 
 $ ./query -s TITLE,REV,DATE -o DATE,TITLE
 the matrix,4.00,2014-04-01
