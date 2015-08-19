@@ -48,7 +48,7 @@ std::string Utility::FormatString(unsigned const left, unsigned const right, cha
 std::string Utility::ToUpper(std::string const &s)
 {
     std::string str(s);
-    std::transform(str.begin(), str.end(),str.begin(), ::toupper);
+    std::transform(str.begin(), str.end(), str.begin(), ::toupper);
     return str;
 }
 
