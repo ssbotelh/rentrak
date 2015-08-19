@@ -145,8 +145,10 @@ void GroupOperation::Run(std::vector<Record> &vRecords)
 
         if (vNameValue.size() == 2)
             m_vFieldToAggregate.emplace_back(Field::ToEnum(vNameValue.front()), GetAggregate(vNameValue.back()));
-        else
+        else if (vNameValue.size() == 1)
             m_vFieldToAggregate.emplace_back(Field::ToEnum(vNameValue.front()), Aggregate::NONE);
+        else
+            throw std::runtime_error("Invalid aggregate: \"" + s + "\"");
     }
 
     //Exactly one field must be in the SELECT list without aggregates
@@ -176,8 +178,10 @@ void GroupOperation::Run(std::vector<Record> &vRecords)
             Aggregate   const &aggr (aggregate.second);
 
             //Step 2: Aggregate field values across records in a group
-            if (aggr == Aggregate::NONE)
-                newRecord.AddField(groupByField, groupName);
+            if (aggr == Aggregate::NONE) {
+                assert(field == groupByField);
+                newRecord.AddField(field, groupName);
+            }
             else {
                 std::string const sAggregatedValue(PerformAggregation(groupRecords, field, aggr));
                 newRecord.AddField(field, sAggregatedValue);
