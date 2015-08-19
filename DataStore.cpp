@@ -45,7 +45,6 @@ Record FixedSizeRecord::GetRecord() const
 }
 
 /////////////////////////////////////////////////
-// class DataStore::iterator
 // class DataStore::const_iterator
 //
 DataStore::const_iterator::const_iterator(DataStore const &ds, size_t const index)
@@ -186,8 +185,8 @@ void DataStore::ImportDataFromFile(std::string const &file)
         Record const oldRec(FetchRecord(ii));
 
         for (auto &pp : vRecordsToAdd) {
-            Record &rec  (pp.first);
-            bool   &added(pp.second);
+            Record const &rec  (pp.first);
+            bool         &added(pp.second);
 
             if (added)
                 continue;
@@ -209,11 +208,10 @@ void DataStore::ImportDataFromFile(std::string const &file)
         Record const &rec(pp.first);
         bool   const &added(pp.second);
 
-        if (added)
-            continue;
-
-        AddRecord(rec);
-        ++numAdded;
+        if (!added) {
+            AddRecord(rec);
+            ++numAdded;
+        }
     }
 
     if (numAdded > 0)
