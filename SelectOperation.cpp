@@ -34,7 +34,7 @@ void SelectOperation::Run(std::vector<Record> &vRecords)
             newRec = rec;
         } else {
             for (Field::Name const &name : vFieldNames)
-                newRec.AddField(name, rec.GetFieldValue(name));
+                newRec.AddField(rec.GetField(name));
         }
 
         vRecords.emplace_back(newRec);

@@ -10,7 +10,10 @@ namespace Utility
                                       std::string const &delim,
                                       bool        const  bAllowEmptyTokens = false);
 
-    std::string FormatString(unsigned const left, unsigned const right, char const sep);
+//    std::string FormatString(unsigned const left, unsigned const right, char const sep);
+
+    unsigned LeftPart (std::string const &word, char const sep);
+    unsigned RightPart(std::string const &word, char const sep);
 
     std::string ToUpper(std::string const &s);
 }

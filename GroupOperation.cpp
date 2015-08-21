@@ -18,20 +18,6 @@ std::string ConvertToStringWithPrecision(double const value)
     return stream.str();
 }
 
-bool IsLessThan(std::string const &l, std::string const &r)
-{
-    //First assume they're numbers
-    try {
-        double const dl(std::stod(l));
-        double const dr(std::stod(r));
-        return (dl < dr);
-    } catch(...) {
-        return (l < r); //compare as strings
-    }
-
-    return false; //never happens
-}
-
 ///////////////////////////////////////////////////////////////////////////
 
 GroupOperation::GroupOperation(std::vector<std::string> const &vCmds,
@@ -44,68 +30,76 @@ GroupOperation::GroupOperation(std::vector<std::string> const &vCmds,
 GroupOperation::~GroupOperation()
 {}
 
-GroupOperation::Aggregate GroupOperation::GetAggregate(std::string const &sToken) const
+GroupOperation::Aggregate GroupOperation::GetAggregate(std::string const &token) const
 {
-    if      (Utility::ToUpper(sToken) == "MIN")
+    std::string const Token(Utility::ToUpper(token));
+
+    if      (Token == "MIN")
         return Aggregate::MIN;
-    else if (Utility::ToUpper(sToken) == "MAX")
+    else if (Token == "MAX")
         return Aggregate::MAX;
-    else if (Utility::ToUpper(sToken) == "SUM")
+    else if (Token == "SUM")
         return Aggregate::SUM;
-    else if (Utility::ToUpper(sToken) == "COUNT")
+    else if (Token == "COUNT")
         return Aggregate::COUNT;
-    else if (Utility::ToUpper(sToken) == "COLLECT")
+    else if (Token == "COLLECT")
         return Aggregate::COLLECT;
     else
-        throw std::runtime_error("Invalid aggregate token: " + sToken);
+        throw std::runtime_error("Invalid aggregate token: " + token);
 
     return Aggregate::MIN; //never happens
 }
 
-std::string GroupOperation::PerformAggregation(std::vector<Record> const &vRecords, Field::Name const field, Aggregate const aggr) const
+Field GroupOperation::PerformAggregation(std::vector<Record> const &vRecords, Field::Name const name, Aggregate const aggr) const
 {
-    std::string result;
+    Field newField;
     std::set<std::string> setUniqueValues;
 
+    if (aggr == Aggregate::NONE) {
+        assert(!vRecords.empty());
+        return vRecords.front().GetField(name);
+    }
+
     for (Record const &rec : vRecords) {
-        std::string const value(rec.GetFieldValue(field));
+        Field const field(rec.GetField(name));
 
         switch (aggr) {
             case Aggregate::MIN: {
                 try {
-                    result = (result.empty() ? value
-                                             : (IsLessThan(result, value) ? result : value));
+                    newField = (newField.IsValid() ? (newField < field ? newField : field)
+                                                   : field);
                 } catch(...) {
-                    throw std::runtime_error("Failed to apply aggregate MIN to field " + Field::ToString(field));
+                    throw std::runtime_error("Failed to apply aggregate MIN to field " + Field::ToString(name));
                 }
                 break;
             }
             case Aggregate::MAX: {
                 try {
-                    result = (result.empty() ? value
-                                             : (!IsLessThan(result, value) ? result : value));
+                    newField = (newField.IsValid() ? (newField > field ? newField : field)
+                                                   : field);
                 } catch(...) {
-                    throw std::runtime_error("Failed to apply aggregate MAX to field " + Field::ToString(field));
+                    throw std::runtime_error("Failed to apply aggregate MAX to field " + Field::ToString(name));
                 }
                 break;
             }
             case Aggregate::SUM: {
                 try {
-                    result = (result.empty() ? value
-                                             : ConvertToStringWithPrecision(std::stod(result) + std::stod(value)));
+                    newField = (newField.IsValid() ? newField + field : field);
                 } catch(...) {
-                    throw std::runtime_error("Failed to apply aggregate SUM to field " + Field::ToString(field));
+                    throw std::runtime_error("Failed to apply aggregate SUM to field " + Field::ToString(name));
                 }
                 break;
             }
             case Aggregate::COUNT: {
-                setUniqueValues.insert(value);
-                result = std::to_string(setUniqueValues.size());
+                setUniqueValues.insert(field.GetValue());
+                newField = Field(name, std::to_string(setUniqueValues.size()));
                 break;
             }
             case Aggregate::COLLECT: {
-                result = (result.empty() ? "[" + value + "]"
-                                         : result.substr(0, result.size() - 1) + "," + value + "]");
+                std::string collection(newField.IsValid() ? newField.GetValue() : "");
+                collection = (collection.empty() ? "[" + field.GetValue() + "]"
+                                                 : collection.substr(0, collection.size() - 1) + "," + field.GetValue() + "]");
+                newField = Field(name, collection);
                 break;
             }
             default:
@@ -113,7 +107,7 @@ std::string GroupOperation::PerformAggregation(std::vector<Record> const &vRecor
         }
     }
 
-    return result;
+    return newField;
 }
 
 void GroupOperation::Run(std::vector<Record> &vRecords)
@@ -161,31 +155,25 @@ void GroupOperation::Run(std::vector<Record> &vRecords)
     Field::Name const groupByField(Field::ToEnum(sGroupParam));
     std::map<std::string, std::vector<Record>> mapGroupedRecords;
     for (Record const &rec : vRecords)
-        mapGroupedRecords[rec.GetFieldValue(groupByField)].push_back(rec);
+        mapGroupedRecords[rec.GetField(groupByField).GetValue()].push_back(rec);
 
     std::vector<Record> vOutputRecords;
 
     //For each group of records...
     for (auto const &group : mapGroupedRecords) {
-        std::string         const &groupName(group.first);
+//        std::string         const &groupName(group.first);
         std::vector<Record> const &groupRecords(group.second);
 
         Record newRecord;
 
         //For each aggregate...
         for (auto const &aggregate : m_vFieldToAggregate) {
-            Field::Name const &field(aggregate.first);
-            Aggregate   const &aggr (aggregate.second);
+            Field::Name const &name(aggregate.first);
+            Aggregate   const &aggr(aggregate.second);
 
             //Step 2: Aggregate field values across records in a group
-            if (aggr == Aggregate::NONE) {
-                assert(field == groupByField);
-                newRecord.AddField(field, groupName);
-            }
-            else {
-                std::string const sAggregatedValue(PerformAggregation(groupRecords, field, aggr));
-                newRecord.AddField(field, sAggregatedValue);
-            }
+            Field const newField(PerformAggregation(groupRecords, name, aggr));
+            newRecord.AddField(newField);
         }
 
         vOutputRecords.emplace_back(newRecord);

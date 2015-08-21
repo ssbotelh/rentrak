@@ -21,7 +21,7 @@ GroupOperation.o \
 
 INCLUDE_DIRS=-I.
 
-CXXFLAGS = $(INCLUDE_DIRS) -Wall -g -std=c++11 -O2
+CXXFLAGS = $(INCLUDE_DIRS) -Wall -g -gdwarf-2 -std=c++11 -O0 
 libdir =  $(LIB_DIRS)
 #libs = -lm -pthread
 

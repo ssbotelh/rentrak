@@ -43,7 +43,7 @@ void FilterOperation::Run(std::vector<Record> &vRecords)
             Field::Name const &filterName (pp.first);
             std::string const &filterValue(pp.second);
 
-            if (rec.GetFieldValue(filterName) != filterValue) {
+            if (rec.GetField(filterName).GetValue() != filterValue) {
                 bMatch = false;
                 break;
             }

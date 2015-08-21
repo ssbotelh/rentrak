@@ -7,7 +7,7 @@
 
 class Record {
 private:
-    std::vector<std::pair<Field::Name, Field::Value>> m_Fields;
+    std::vector<Field> m_Fields;
 
 public:
     Record();
@@ -16,10 +16,10 @@ public:
 
     bool operator==(Record const &that) const;
 
-    void         AddField(Field::Name const &name, Field::Value const &value);
-    bool         HasField(Field::Name const &name) const;
-    Field::Value GetFieldValue(Field::Name const &name) const;
-    void         Print() const;
+    void  AddField(Field const &field);
+    bool  HasField(Field::Name const &name) const;
+    Field GetField(Field::Name const &name) const;
+    void  Print() const;
 };
 
 #endif //RENTRAK_RECORD

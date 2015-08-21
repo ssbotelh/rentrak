@@ -30,9 +30,9 @@ void SortOperation::Run(std::vector<Record> &vRecords)
     //Sort vRecords by each of the requested fields.
     //WARNING: Must go through fields in "-o" list from last to first!
     for (std::vector<Field::Name>::const_reverse_iterator rit = vFieldNames.rbegin(); rit != vFieldNames.rend(); ++rit) {
-        Field::Name const &field(*rit);
+        Field::Name const &name(*rit);
         std::sort(vRecords.begin(), vRecords.end(),
-                  [&field](Record const &r1, Record const &r2) { return r1.GetFieldValue(field) < r2.GetFieldValue(field); });
+                  [&name](Record const &r1, Record const &r2) { return r1.GetField(name) < r2.GetField(name); });
     }
 }
 

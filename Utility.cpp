@@ -35,6 +35,7 @@ std::vector<std::string> Utility::Tokenize(std::string const        &input,
     return tokens;
 }
 
+/*
 std::string Utility::FormatString(unsigned const left, unsigned const right, char const sep)
 {
     std::string ret(std::to_string(left));
@@ -43,6 +44,29 @@ std::string Utility::FormatString(unsigned const left, unsigned const right, cha
     ret += std::to_string(right);
 
     return ret;
+}
+*/
+
+unsigned Utility::LeftPart(std::string const &word, char const sep)
+{
+    unsigned left(0);
+
+    size_t const pos(word.find(sep));
+    if (pos != std::string::npos)
+        left = std::stol(word.substr(0, pos));
+
+    return left;
+}
+
+unsigned Utility::RightPart(std::string const &word, char const sep)
+{
+    unsigned right(0);
+
+    size_t const pos(word.find(sep));
+    if (pos != std::string::npos)
+        right = std::stol(word.substr(pos + 1));
+
+    return right;
 }
 
 std::string Utility::ToUpper(std::string const &s)

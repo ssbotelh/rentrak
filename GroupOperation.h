@@ -13,10 +13,10 @@ private: //fields
     std::vector<std::pair<Field::Name, Aggregate>> m_vFieldToAggregate;
 
 private: //methods
-    Aggregate   GetAggregate(std::string const &sToken) const;
-    std::string PerformAggregation(std::vector<Record> const &vRecords,
-                                   Field::Name         const  field,
-                                   Aggregate           const aggr) const;
+    Aggregate GetAggregate(std::string const &token) const;
+    Field     PerformAggregation(std::vector<Record> const &vRecords,
+                                 Field::Name         const  name,
+                                 Aggregate           const aggr) const;
 
 public:
     GroupOperation(std::vector<std::string> const &cmd, size_t const priority, DataStore const &dataStore);
