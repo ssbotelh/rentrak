@@ -3,6 +3,7 @@
 // // defines a template class to handle record files
 // // Author: Vijay Mathew Pandyalakal
 // // Date: 12/23/2001 11:08:12 AM
+// // http://www.codeproject.com/Articles/4843/DataStore-A-template-class-for-creating-sequential
 // // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 #ifndef RENTRAK_GENERIC_DATASTORE

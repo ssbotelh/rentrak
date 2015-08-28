@@ -44,6 +44,17 @@ void Record::AddField(Field const &field)
         m_Fields.emplace_back(field);
 }
 
+void Record::AddField(Field &&field)
+{
+    auto findIt(std::find_if(m_Fields.begin(), m_Fields.end(),
+                [&field](Field const &f) { return f.GetName() == field.GetName(); }));
+
+    if (findIt != m_Fields.cend())
+        *findIt = field;
+    else
+        m_Fields.emplace_back(std::move(field));
+}
+
 bool Record::HasField(Field::Name const &name) const
 {
     auto const findIt(std::find_if(m_Fields.begin(), m_Fields.end(),
@@ -62,6 +73,11 @@ Field Record::GetField(Field::Name const &name) const
         field = *findIt;
 
     return field;
+}
+
+std::string Record::GetFieldValue(Field::Name const &name) const
+{
+    return GetField(name).GetValue();
 }
 
 void Record::Print() const

@@ -35,18 +35,6 @@ std::vector<std::string> Utility::Tokenize(std::string const        &input,
     return tokens;
 }
 
-/*
-std::string Utility::FormatString(unsigned const left, unsigned const right, char const sep)
-{
-    std::string ret(std::to_string(left));
-    ret += sep;
-    ret += (right < 10 ? "0" : "");
-    ret += std::to_string(right);
-
-    return ret;
-}
-*/
-
 unsigned Utility::LeftPart(std::string const &word, char const sep)
 {
     unsigned left(0);

@@ -9,21 +9,13 @@
 #include <iomanip>      // std::setprecision
 #include <sstream>
 
-//Helper functions
-//
-std::string ConvertToStringWithPrecision(double const value)
-{
-    std::stringstream stream;
-    stream << std::fixed << std::setprecision(2) << value;
-    return stream.str();
-}
-
 ///////////////////////////////////////////////////////////////////////////
 
-GroupOperation::GroupOperation(std::vector<std::string> const &vCmds,
-                             size_t                   const  priority,
-                             DataStore                const &dataStore)
-    : Operation(vCmds, priority, dataStore)
+GroupOperation::GroupOperation(std::string const &selectFlds,
+                               size_t      const  priority,
+                               DataStore   const &dataStore)
+    : Operation(selectFlds, priority, dataStore)
+    , m_sGroupParam()
     , m_vFieldToAggregate()
 {}
 
@@ -112,25 +104,21 @@ Field GroupOperation::PerformAggregation(std::vector<Record> const &vRecords, Fi
 
 void GroupOperation::Run(std::vector<Record> &vRecords)
 {
-    assert(m_vsCommands.size() == 2); // "-g" and "-s"
-    std::string const sGroupParam (m_vsCommands.front());
-    std::string const sSelectParam(m_vsCommands.back());
-
-    if (sGroupParam.empty())
+    if (m_sGroupParam.empty())
         throw std::runtime_error("Group parameter (-g) expects an argument");
 
     //Only one group parameter supported by -g
-    if (Utility::Tokenize(sGroupParam, ",:").size() > 1)
+    if (Utility::Tokenize(m_sGroupParam, ",:").size() > 1)
         throw std::runtime_error("Group parameter (-g) must be a single field");
 
     //First collect the "-s" params
-    std::vector<std::string> const vSelectTokens(Utility::Tokenize(sSelectParam, ","));
+    std::vector<std::string> const vSelectTokens(Utility::Tokenize(m_sSelectFields, ","));
     if (vSelectTokens.empty())
         throw std::runtime_error("Group feature (-g) cannot be used without a SELECT list (-s)");
 
     //The field we want to group by must be on the SELECT list, and must not be associated with an aggregate
-    if (std::find(vSelectTokens.begin(), vSelectTokens.end(), sGroupParam) == vSelectTokens.end())
-        throw std::runtime_error("Group field (" + sGroupParam + ") must be on the SELECT list (-s) and cannot have aggregates");
+    if (std::find(vSelectTokens.begin(), vSelectTokens.end(), m_sGroupParam) == vSelectTokens.end())
+        throw std::runtime_error("Group field (" + m_sGroupParam + ") must be on the SELECT list (-s) and cannot have aggregates");
 
     //Now find aggregates associated with each SELECT field
     for (std::string const &s : vSelectTokens) {
@@ -152,16 +140,15 @@ void GroupOperation::Run(std::vector<Record> &vRecords)
 
     //Now let's do real work!
     //Step 1: Group records by the "group-by" field
-    Field::Name const groupByField(Field::ToEnum(sGroupParam));
+    Field::Name const groupByField(Field::ToEnum(m_sGroupParam));
     std::map<std::string, std::vector<Record>> mapGroupedRecords;
     for (Record const &rec : vRecords)
-        mapGroupedRecords[rec.GetField(groupByField).GetValue()].push_back(rec);
+        mapGroupedRecords[rec.GetFieldValue(groupByField)].push_back(rec);
 
     std::vector<Record> vOutputRecords;
 
     //For each group of records...
     for (auto const &group : mapGroupedRecords) {
-//        std::string         const &groupName(group.first);
         std::vector<Record> const &groupRecords(group.second);
 
         Record newRecord;

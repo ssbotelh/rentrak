@@ -103,12 +103,12 @@ FixedSizeRecord DataStore::ConvertToFixedSize(Record const &rec) const
 {
     FixedSizeRecord fsr;
 
-    CopyString(fsr.stb,                 rec.GetField(Field::STB).GetValue(), 64);
-    CopyString(fsr.title,               rec.GetField(Field::TITLE).GetValue(), 64);
-    CopyString(fsr.provider,            rec.GetField(Field::PROVIDER).GetValue(), 64);
-    CopyString(fsr.date,                rec.GetField(Field::DATE).GetValue(), 11);
-    CopyValue (fsr.dollars, fsr.cents,  rec.GetField(Field::REV).GetValue(), '.');
-    CopyValue (fsr.hours, fsr.mins,     rec.GetField(Field::VIEW_TIME).GetValue(), ':');
+    CopyString(fsr.stb,                 rec.GetFieldValue(Field::STB),        64);
+    CopyString(fsr.title,               rec.GetFieldValue(Field::TITLE),      64);
+    CopyString(fsr.provider,            rec.GetFieldValue(Field::PROVIDER),   64);
+    CopyString(fsr.date,                rec.GetFieldValue(Field::DATE),       11);
+    CopyValue (fsr.dollars, fsr.cents,  rec.GetFieldValue(Field::REV),       '.');
+    CopyValue (fsr.hours, fsr.mins,     rec.GetFieldValue(Field::VIEW_TIME), ':');
 
     return fsr;
 }

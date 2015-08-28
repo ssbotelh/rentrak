@@ -4,10 +4,11 @@
 #include <algorithm>
 #include <cassert>
 
-SortOperation::SortOperation(std::vector<std::string> const &vCmds,
-                             size_t                   const  priority,
-                             DataStore                const &dataStore)
-    : Operation(vCmds, priority, dataStore)
+SortOperation::SortOperation(std::string const &selectFlds,
+                             size_t      const  priority,
+                             DataStore   const &dataStore)
+    : Operation(selectFlds, priority, dataStore)
+    , m_sSortParams()
 {}
 
 SortOperation::~SortOperation()
@@ -15,13 +16,11 @@ SortOperation::~SortOperation()
 
 void SortOperation::Run(std::vector<Record> &vRecords)
 {
-    assert(m_vsCommands.size() == 1);
-    std::string const sSortParams(m_vsCommands.front());
-    if (sSortParams.empty())
+    if (m_sSortParams.empty())
         throw std::runtime_error("Sort parameter (-o) expects an argument");
 
     //Collect all field names we want to sort by
-    std::vector<std::string> const tokens(Utility::Tokenize(sSortParams, ","));
+    std::vector<std::string> const tokens(Utility::Tokenize(m_sSortParams, ","));
 
     std::vector<Field::Name> vFieldNames;
     for (std::string const &token : tokens)
@@ -31,6 +30,10 @@ void SortOperation::Run(std::vector<Record> &vRecords)
     //WARNING: Must go through fields in "-o" list from last to first!
     for (std::vector<Field::Name>::const_reverse_iterator rit = vFieldNames.rbegin(); rit != vFieldNames.rend(); ++rit) {
         Field::Name const &name(*rit);
+
+        if (!IsOnSelectList(name))
+            throw std::runtime_error("Sort field \"" + Field::ToString(name) + "\" not on select list (-s)");
+
         std::sort(vRecords.begin(), vRecords.end(),
                   [&name](Record const &r1, Record const &r2) { return r1.GetField(name) < r2.GetField(name); });
     }

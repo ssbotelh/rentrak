@@ -31,17 +31,18 @@ Operation *TaskExecutor::CreateNewOperation(std::string const &prefix, std::stri
     Operation *pOper(nullptr);
 
     if (prefix == "s")
-        pOper = new SelectOperation({cmd}, 0, m_dataStore);
+        pOper = new SelectOperation(m_cmdArgs.GetValue("s"), 0, m_dataStore);
     else if (prefix == "f")
-        pOper = new FilterOperation({cmd}, 1, m_dataStore);
+        pOper = new FilterOperation(m_cmdArgs.GetValue("s"), 1, m_dataStore);
     else if (prefix == "o")
-        pOper = new SortOperation({cmd}, 2, m_dataStore);
+        pOper = new SortOperation  (m_cmdArgs.GetValue("s"), 2, m_dataStore);
     else if (prefix == "g")
-        pOper = new GroupOperation({cmd, m_cmdArgs.GetValue("s")}, 3, m_dataStore);
+        pOper = new GroupOperation (m_cmdArgs.GetValue("s"), 3, m_dataStore);
 
     if (pOper == nullptr)
         throw std::runtime_error("Unknown cmd line prefix: " + prefix);
 
+    pOper->SetExtraParam(cmd);
     return pOper;
 }
 
@@ -59,6 +60,9 @@ void TaskExecutor::Run()
         m_dataStore.ImportDataFromFile(m_cmdArgs.GetValue("i"));
         return;
     }
+
+    if (!m_cmdArgs.Exists("s"))
+        throw std::runtime_error("Missing select parameter \"-s\"");
 
     //Collect operations from cmd line
     for (CmdLineArgs::const_iterator it = m_cmdArgs.begin(); it != m_cmdArgs.end(); ++it)

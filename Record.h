@@ -16,10 +16,12 @@ public:
 
     bool operator==(Record const &that) const;
 
-    void  AddField(Field const &field);
-    bool  HasField(Field::Name const &name) const;
-    Field GetField(Field::Name const &name) const;
-    void  Print() const;
+    void        AddField(Field const &field);
+    void        AddField(Field &&field);
+    bool        HasField(Field::Name const &name) const;
+    Field       GetField(Field::Name const &name) const;
+    std::string GetFieldValue(Field::Name const &name) const;
+    void        Print() const;
 };
 
 #endif //RENTRAK_RECORD

@@ -5,10 +5,11 @@
 #include <stdexcept>
 #include <cassert>
 
-FilterOperation::FilterOperation(std::vector<std::string> const &vCmds,
-                                 size_t                   const  priority,
-                                 DataStore                const &dataStore)
-    : Operation(vCmds, priority, dataStore)
+FilterOperation::FilterOperation(std::string const &selectFlds,
+                                 size_t      const  priority,
+                                 DataStore   const &dataStore)
+    : Operation(selectFlds, priority, dataStore)
+    , m_sFilterParams()
 {}
 
 FilterOperation::~FilterOperation()
@@ -16,13 +17,11 @@ FilterOperation::~FilterOperation()
 
 void FilterOperation::Run(std::vector<Record> &vRecords)
 {
-    assert(m_vsCommands.size() == 1);
-    std::string const sFilterParams(m_vsCommands.front());
-    if (sFilterParams.empty())
+    if (m_sFilterParams.empty())
         throw std::runtime_error("Filter parameter (-f) expects an argument");
 
     //Collect all filters we want to apply
-    std::vector<std::string> const tokens(Utility::Tokenize(sFilterParams, ","));
+    std::vector<std::string> const tokens(Utility::Tokenize(m_sFilterParams, ","));
 
     std::map<Field::Name, std::string> mapFilters;
     for (std::string const &token : tokens) {
@@ -43,7 +42,10 @@ void FilterOperation::Run(std::vector<Record> &vRecords)
             Field::Name const &filterName (pp.first);
             std::string const &filterValue(pp.second);
 
-            if (rec.GetField(filterName).GetValue() != filterValue) {
+            if (!IsOnSelectList(filterName))
+                throw std::runtime_error("Filter field \"" + Field::ToString(filterName) + "\" not on select list (-s)");
+
+            if (rec.GetFieldValue(filterName) != filterValue) {
                 bMatch = false;
                 break;
             }

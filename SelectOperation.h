@@ -6,9 +6,9 @@
 
 class SelectOperation : public Operation {
 public:
-    SelectOperation(std::vector<std::string> const &vCmds,
-                    size_t                   const  priority,
-                    DataStore                const &dataStore);
+    SelectOperation(std::string const &selectFlds,
+                    size_t      const  priority,
+                    DataStore   const &dataStore);
 
     ~SelectOperation();
 

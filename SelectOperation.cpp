@@ -3,10 +3,10 @@
 #include "Utility.h"
 #include <cassert>
 
-SelectOperation::SelectOperation(std::vector<std::string> const &vCmds,
-                                 size_t                   const  priority,
-                                 DataStore                const &dataStore)
-    : Operation(vCmds, priority, dataStore)
+SelectOperation::SelectOperation(std::string const &selectFlds,
+                                 size_t      const  priority,
+                                 DataStore   const &dataStore)
+    : Operation(selectFlds, priority, dataStore)
 {}
 
 SelectOperation::~SelectOperation()
@@ -15,8 +15,7 @@ SelectOperation::~SelectOperation()
 void SelectOperation::Run(std::vector<Record> &vRecords)
 {
     //Collect all field names we want to select
-    assert(m_vsCommands.size() == 1);
-    std::vector<std::string> const tokens(Utility::Tokenize(m_vsCommands.front(), ","));
+    std::vector<std::string> const tokens(Utility::Tokenize(m_sSelectFields, ","));
 
     std::vector<Field::Name> vFieldNames;
     for (std::string const &token : tokens)
