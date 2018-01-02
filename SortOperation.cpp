@@ -3,6 +3,7 @@
 #include "Utility.h"
 #include <algorithm>
 #include <cassert>
+#include <stdexcept>
 
 SortOperation::SortOperation(std::string const &selectFlds,
                              size_t      const  priority,
