@@ -1,0 +1,14 @@
+// HOW TO ADD, COMMIT AND CHECK IN TO MASTER
+echo "# rentrak" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/ssbotelh/rentrak.git
+git push -u origin HEAD:master
+
+// HOW TO CHECKOUT FROM MASTER
+git init
+git remote add origin https://github.com/ssbotelh/rentrak.git
+git fetch
+git checkout origin/master
+

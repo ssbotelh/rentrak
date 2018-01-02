@@ -1,0 +1,2 @@
+STB|TITLE|PROVIDER|DATE|REV|VIEW_TIME
+stb4|bing bang theory with some really long name that exceeds 64 chars and therefore has to be trimmed upon insertion|warner bros|2014-04-02|8.00|2:45
