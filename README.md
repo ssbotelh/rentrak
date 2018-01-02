@@ -1,5 +1,4 @@
-# rentrak code challenge
-(UPDATED IN 2017)
+# rentrak code challenge (Aug.2015)
 
 ## General remarks:
 1. All functionality described in items 1, 2.1 and 2.2 was implemented. 
